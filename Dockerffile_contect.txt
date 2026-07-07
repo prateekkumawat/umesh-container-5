@@ -8,9 +8,19 @@ Dockerfile Instruction
 4. ADD  :::: copy image content from sorce to container destiantion directory; download datat form link 
              ; archive tar ball extract destiantion
 5. EXPOSE ::: image show port that runnings or availabel for map 
+6. WORKDIR ::: define default use directory
 
 
 - if you want to create image from Dockerfile we need to specify docker build command 
   eg. docker build -t image_name .  # you should run this command from directory where your dockerfile exist
 - Dockerfile can not be find or read your data out of directory of parent 
 - 
+
+link command redis app 
+docker run -dit --name redis -p 6379:6379 redis:7-alpine
+docker run -dit --name pyapp2 --link redis:redis -p 8081:6000 flaskapp:v2
+         or
+docker run -dit --name pyapp5 -e REDIS_HOST=172.17.0.4 -p 8082:6000 flaskapp:v2
+---> redis ip get using docker inspect redis
+docker build -t flaskapp:v1 . 
+
