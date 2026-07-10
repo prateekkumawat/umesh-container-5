@@ -1,0 +1,21 @@
+FROM node:22-slim AS builder
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json to the working directory
+COPY web-tier/ /app/
+
+# Install dependencies
+RUN npm install -g npm@12.0.0
+RUN npm install
+RUN npm run build
+
+# Copy the built application to a new stage
+FROM nginx:alpine
+
+# Copy the built application from the builder stage to the nginx html directory
+COPY --from=builder /app/build /usr/share/nginx/html/
+
+# Expose port 80 for the web server
+EXPOSE 80

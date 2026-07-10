@@ -1,0 +1,41 @@
+services: 
+  wordpress: 
+    image: wordpress:latest
+    container_name: wordpress_container
+    ports: 
+      - "8081:80"
+    environment: 
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: myapp
+      WORDPRESS_DB_PASSWORD: myapppassword
+      WORDPRESS_DB_NAME: wpdb
+    depends_on: 
+      - mysql
+    volumes:
+      - wordpress_data:/var/www/html  
+  mysql:     
+    image: mysql:5.7
+    container_name: mysql_container
+    environment: 
+      MYSQL_ROOT_PASSWORD: redhat123
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: myapp
+      MYSQL_PASSWORD: myapppassword    
+    volumes:
+       - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_container
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: myapp
+      PMA_PASSWORD: myapppassword
+    depends_on:
+      - mysql     
+
+volumes:
+  mysql_data: 
+  wordpress_data:

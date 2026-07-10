@@ -1,0 +1,32 @@
+services: 
+  web_tier_app:
+    container_name: web_tier_app_container
+    build: 
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "8088:4000"
+
+  app_tier_app:
+    container_name: app_tier_app_container
+    build: 
+      context: .
+      dockerfile: Dockerfile.app
+    ports:
+      - "8089:80"    
+    depends_on: 
+      - mysql
+
+  mysql: 
+    image: mysql:5.7
+    container_name: mysql_container
+    environment: 
+      MYSQL_ROOT_PASSWORD: redhat123
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: myapp
+      MYSQL_PASSWORD: myapppassword    
+    volumes:
+       - mysql_data:/var/lib/mysql 
+
+volumes:
+  mysql_data:   
