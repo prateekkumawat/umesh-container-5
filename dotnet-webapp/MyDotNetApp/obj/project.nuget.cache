@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "dgSpecHash": "xZjo/USLaAY=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Prateek\\Documents\\jenkins-6pm\\umeshji-5pm-container\\umesh-container-5\\dotnet-webapp\\MyDotNetApp\\MyDotNetApp.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Prateek\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.9\\microsoft.aspnetcore.openapi.10.0.9.nupkg.sha512",
+    "C:\\Users\\Prateek\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'Microsoft.OpenApi' 2.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
+      "projectPath": "C:\\Users\\Prateek\\Documents\\jenkins-6pm\\umeshji-5pm-container\\umesh-container-5\\dotnet-webapp\\MyDotNetApp\\MyDotNetApp.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\Prateek\\Documents\\jenkins-6pm\\umeshji-5pm-container\\umesh-container-5\\dotnet-webapp\\MyDotNetApp\\MyDotNetApp.csproj",
+      "libraryId": "Microsoft.OpenApi",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}
