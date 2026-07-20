@@ -1,0 +1,16 @@
+kubernetes support diffrenet workloads 
+
+pods ::: basic compute unit manage containers 
+
+Deployment :::: applications those are not supported states that deploy by using deployment. 1.20 
+pod scale , rollout feature 
+
+
+stateful ::: 
+state management --- uniq ideentity 
+mysql redis 
+
+2 redis ---- database 
+
+Daemonset --- pod running on every node ; new node auto create pod ; node relase pod 
+agent service ; storage ; logging ; newtork 

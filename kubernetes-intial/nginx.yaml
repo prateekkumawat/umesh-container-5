@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: intitalpod
+  labels:
+    app.kubernetes.io/name: nginx 
+spec:
+  containers:
+  - name: intialpod
+    image: prateekkumawat/villa:latest
+    resources:
+      requests: 
+        cpu: "100m"
+        memory: "100Mi"
+      limits:
+        memory: "200Mi"
+        cpu: "200m"
+    ports:
+      - containerPort: 80
+
+---
+# create service of nginx intialapp pod 
+kind: Service
+apiVersion: v1
+metadata:
+  name: intial-svc
+spec:
+  selector:
+    app.kubernetes.io/name: nginx
+  type: NodePort
+  ports:
+  - name: http-port
+    port:  80
+    targetPort:  80
+
+---
+# Debug pod of ubuntu to check and test ingress 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug1
+  labels:
+    app.kubernetes.io/name: debug
+spec:
+  containers:
+  - name: debug1
+    image: nicolaka/netshoot
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    command:
+      - sleep
+      - "3600"
