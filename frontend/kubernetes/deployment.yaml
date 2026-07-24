@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: result-server
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: frontend-secret
+  namespace: result-server
+type: Opaque
+data:
+  password: cmVkaGF0
+  admin: cGhvbmVib29rdXNlcg==
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: result-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: result-app
+  template:
+    metadata:
+      labels:
+        app: result-app
+    spec:
+      containers:
+      - name: frontend
+        image: pyapp:frontend
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "500m"
+          limits:
+            memory: "700Mi"
+            cpu: "700m"
+        ports:
+        - containerPort: 80
+        env:
+          - name: MYSQL_DATABASE_HOST
+            value: mysql-svc.result-server.svc.cluster.local
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: frontend-secret
+                key: admin
+          - name: MYSQL_PASSWORD
+            valueFrom: 
+              secretKeyRef:
+                name: frontend-secret
+                key: password
+          - name: MYSQL_DATABASE
+            value: phonebook 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: result-server
+spec:
+  selector:
+    matchLabels:
+      app: result-app-database
+  template:
+    metadata:
+      labels:
+        app: result-app-database
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:latest
+        resources:
+          requests:
+            memory: "800Mi"
+            cpu: "800m"
+          limits:
+            memory: "1000Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 3306
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: redhat
+          - name: MYSQL_USER
+            value: phonebookuser 
+          - name: MYSQL_PASSWORD
+            value: redhat
+          - name: MYSQL_DATABASE
+            value: phonebook  
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql-svc
+  namespace: result-server
+spec:
+  selector:
+    app: result-app-database
+  type: ClusterIP
+  ports:
+  - name: mysql
+    port: 3306
+    targetPort: 3306
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: frontend-svc
+  namespace: result-server
+spec:
+  selector:
+    app: result-app
+  type: NodePort
+  ports:
+  - name: http-port
+    port: 80
+    targetPort: 80
+    nodePort: 31808    
