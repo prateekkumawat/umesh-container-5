@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: postgresql 
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:latest 
+        resources:
+          requests: 
+            memory: "100Mi"
+            cpu: "500m"
+          limits:
+            memory: "128Mi"
+            cpu: "800m"
+        ports:
+        - containerPort: 5432
+        env: 
+        - name: POSTGRES_PASSWORD
+          valueFrom: 
+            secretKeyRef: 
+              name: pg-admin-secret
+              key: password 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+  namespace: postgresql
+spec:
+  selector:
+    app: postgres
+  type: ClusterIP
+  ports:
+  - name: postgres-port
+    protocol: TCP
+    port: 5432
+    targetPort: 5432
