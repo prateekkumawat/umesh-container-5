@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: storage
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mypvc
+  namespace: storage
+spec:
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+  namespace: storage
+  labels:
+    app.kubernetes.io/name: myapp
+spec:
+  containers:
+  - name: myapp
+    image: ubuntu
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    command:
+      - sleep
+      - "3600"
+    volumeMounts:
+    - name: datavol
+      mountPath: /opt
+  volumes:
+  - name: datavol
+    persistentVolumeClaim: 
+      claimName: mypvc
