@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: novepay
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: novepay-app
+  namespace: novepay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: novepay-app
+  template:
+    metadata:
+      labels:
+        app: novepay-app
+    spec:     
+      containers:
+      - name: novepay-app
+        image: prateekkumawat/villa:novepay
+        resources: 
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+        ports: 
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: novepay-service
+  namespace: novepay
+spec:
+  selector:
+    app: novepay-app
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP  
+            
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: novepay-ingress
+  namespace: novepay
+  annotations:
+    konghq.com/strip-path: "true"
+    konghq.com/protocols: "http"
+spec:
+  ingressClassName: kong
+  rules:
+  - host: novepay.domain.example.com 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: novepay-service
+            port:
+              number: 80        
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pgsql-ingress
+  namespace: postgresql
+  annotations:
+    konghq.com/strip-path: "true"
+    konghq.com/protocols: "http"
+spec:
+  ingressClassName: kong
+  rules:
+  - host: pgadmin.mgmt.domain.example.com 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pgadmin-svc
+            port:
+              number: 80        

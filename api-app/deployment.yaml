@@ -1,0 +1,156 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: python-apps
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: python-app-secret
+  namespace: python-apps
+type: Opaque
+data:
+  password: ZmxlY3RyYWc=
+  user: ZGJ1c2Vy
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-app
+  namespace: python-apps
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:latest
+        resources:
+          limits:
+            memory: "1000Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 3306
+        env: 
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: python-app-secret
+              key: user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: python-app-secret
+              key: password      
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: python-app-secret
+              key: password
+        - name: MYSQL_DB
+          value: userdb
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-apps-deploy
+  labels:
+    name: python-apps-deploy
+    app: python
+  namespace: python-apps
+spec:
+  selector:
+    matchLabels:
+      app: python
+  template:
+    metadata:
+      labels:
+        app: python
+    spec:
+      containers:
+      - name: python-apps-deploy
+        image: prateekkumawat/pythonapps:apps-v1.0.1
+        env: 
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: python-app-secret
+              key: user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: python-app-secret
+              key: password      
+        - name: MYSQL_HOST
+          value: mysql-apps-svc.python-apps.svc.cluster.local
+        - name: MYSQL_DB
+          value: userdb    
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "400m"
+          limits:
+            memory: "800Mi"
+            cpu: "800m"
+        ports:
+        - containerPort: 5000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-apps-svc
+  namespace: python-apps
+spec:
+  selector:
+    app: python
+  type: ClusterIP
+  ports:
+  - port: 5000
+    targetPort: 5000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-apps-svc
+  namespace: python-apps
+spec:
+  selector:
+    app: mysql
+  type: ClusterIP
+  ports:
+  - port: 3306
+    targetPort: 3306
+
+---
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: python-apps-ingress
+  namespace: python-apps
+  annotations:
+    konghq.com/strip-path: "true"
+    konghq.com/protocols: "http"
+spec:
+  ingressClassName: kong
+  rules:
+  - host: pythonapps.api.domain.example.com 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: python-apps-svc
+            port:
+              number: 5000        
