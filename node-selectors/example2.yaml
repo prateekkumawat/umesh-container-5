@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example2
+  template:
+    metadata:
+      labels:
+        app: example2
+    spec:
+      containers:
+      - name: example2
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+      tolerations:
+      - key: "node-role.kubernetes.io/control-plane"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"  
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: keysdata
+                operator: In
+                values:
+                - master 
