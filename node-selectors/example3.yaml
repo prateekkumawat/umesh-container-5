@@ -14,3 +14,8 @@ spec:
         cpu: "500m"
     ports:
       - containerPort: 80
+  tolerations:
+  - key: "role"
+    operator: "Equal"
+    effect: "NoSchedule"
+    value: "master"
