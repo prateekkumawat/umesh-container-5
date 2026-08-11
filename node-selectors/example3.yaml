@@ -43,3 +43,31 @@ spec:
     operator: "Equal"
     effect: "NoSchedule"
     value: "worker"
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-affinity
+  labels:
+    app.kubernetes.io/name: myapp-affinity
+spec:
+  containers:
+  - name: myapp-affinity
+    image: nginx:latest
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 80
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "disk-type"
+            operator: "In"
+            values:
+            - "ssd"
+    
