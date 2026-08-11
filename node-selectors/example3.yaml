@@ -19,3 +19,27 @@ spec:
     operator: "Equal"
     effect: "NoSchedule"
     value: "master"
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-worker
+  labels:
+    app.kubernetes.io/name: myapp-worker
+spec:
+  containers:
+  - name: myapp-worker
+    image: nginx:latest
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 80
+  tolerations:
+  - key: "role"
+    operator: "Equal"
+    effect: "NoSchedule"
+    value: "worker"
